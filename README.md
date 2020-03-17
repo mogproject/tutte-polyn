@@ -78,3 +78,9 @@ for i in 2 3 4 5 6 7 8; do ./scripts/vectorize.py -n $i ./data/output/graph${i}.
 for i in {2..10}; do ./scripts/vec_to_csv.py ./data/vector/vector${i}.txt > ./data/vector/vector${i}.csv; done
 ```
 
+
+## References
+
+- [Ball mapper: a shape summary for topological data analysis](https://arxiv.org/pdf/1901.07410.pdf)
+
+
