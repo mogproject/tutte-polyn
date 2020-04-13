@@ -78,6 +78,26 @@ for i in 2 3 4 5 6 7 8; do ./scripts/vectorize.py -n $i ./data/output/graph${i}.
 for i in {2..10}; do ./scripts/vec_to_csv.py ./data/vector/vector${i}.txt > ./data/vector/vector${i}.csv; done
 ```
 
+## Compute Graph Invariants
+
+### (1) Number of Edges
+
+```
+mkdir data/inv
+for i in {2..10}; do ./scripts/invariant.py -n $i -t num-edges ./data/input/graph$i.dat > ./data/inv/graph$i.num-edges.csv; done
+```
+
+< 6 min
+
+### (2) Number of Connected Components
+
+```
+for i in {2..10}; do ./scripts/invariant.py -n $i -t cc ./data/input/graph$i.dat > ./data/inv/graph$i.cc.csv; done
+```
+
+< 7 min
+
+
 
 ## References
 
