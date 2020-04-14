@@ -1,6 +1,12 @@
 # tutte-polyn
 Research on the Tutte polynomials.
 
+# Prerequisite
+
+```
+pip3 install python-igraph plotly ipywidgets
+npm install plotlywidget
+```
 
 
 
