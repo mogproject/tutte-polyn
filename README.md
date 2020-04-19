@@ -8,6 +8,9 @@ pip3 install python-igraph plotly ipywidgets
 npm install plotlywidget
 ```
 
+```
+pip3 install kmapper
+```
 
 
 # Data Preparation
@@ -84,6 +87,14 @@ for i in 2 3 4 5 6 7 8; do ./scripts/vectorize.py -n $i ./data/output/graph${i}.
 for i in {2..10}; do ./scripts/vec_to_csv.py ./data/vector/vector${i}.txt > ./data/vector/vector${i}.csv; done
 ```
 
+## Run Mapper
+
+```
+mkdir data/mapped
+for i in {2..10}; do ./scripts/run_mapper.py ./data/vector/vector${i}.txt > ./data/mapped/mapped${i}.json; done
+```
+
+
 ## Compute Graph Invariants
 
 ### (1) Number of Edges
@@ -103,6 +114,12 @@ for i in {2..10}; do ./scripts/invariant.py -n $i -t cc ./data/input/graph$i.dat
 
 < 7 min
 
+
+### (3) Connectedness (1: connected, 0: disconnected)
+
+```
+for i in {2..10}; do ./scripts/invariant.py -n $i -t conn ./data/input/graph$i.dat > ./data/inv/graph$i.conn.csv; done
+```
 
 
 ## References
