@@ -91,7 +91,7 @@ for i in {2..10}; do ./scripts/vec_to_csv.py ./data/vector/vector${i}.txt > ./da
 
 ```
 mkdir data/mapped
-for i in {2..10}; do ./scripts/run_mapper.py ./data/vector/vector${i}.txt > ./data/mapped/mapped${i}.json; done
+for i in {2..10}; do ./scripts/run_mapper.py ./data/vector/vector${i}.csv > ./data/mapped/mapped${i}.json; done
 ```
 
 
