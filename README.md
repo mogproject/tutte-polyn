@@ -4,7 +4,7 @@ Research on the Tutte polynomials.
 # Prerequisite
 
 ```
-pip3 install python-igraph plotly ipywidgets
+pip3 install python-igraph plotly ipywidgets psutil
 npm install plotlywidget
 ```
 
@@ -87,14 +87,6 @@ for i in 2 3 4 5 6 7 8; do ./scripts/vectorize.py -n $i ./data/output/graph${i}.
 for i in {2..10}; do ./scripts/vec_to_csv.py ./data/vector/vector${i}.txt > ./data/vector/vector${i}.csv; done
 ```
 
-## Run Mapper
-
-```
-mkdir data/mapped
-for i in {2..10}; do ./scripts/run_mapper.py ./data/vector/vector${i}.csv > ./data/mapped/mapped${i}.json; done
-```
-
-
 ## Compute Graph Invariants
 
 ### (1) Number of Edges
@@ -120,6 +112,39 @@ for i in {2..10}; do ./scripts/invariant.py -n $i -t cc ./data/input/graph$i.dat
 ```
 for i in {2..10}; do ./scripts/invariant.py -n $i -t conn ./data/input/graph$i.dat > ./data/inv/graph$i.conn.csv; done
 ```
+
+
+## For n=10
+
+### (1) Random Sampling
+
+```
+./scripts/create_sample.py 12005168 1000000 -s 1 > ./data/sample_n10_k1e6.txt
+```
+
+### (2) Filter input files
+
+```
+./scripts/filter_sample.py ./data/vector/vector10.csv ./data/sample_n10_k1e6.txt > ./data/vector/vector10_1e6.csv
+./scripts/filter_sample.py ./data/input/graph10.dat ./data/sample_n10_k1e6.txt > ./data/input/graph10_1e6.dat
+```
+
+< 2 min
+
+## RunM apper
+
+```
+mkdir data/mapped
+for i in {2..9}; do ./scripts/run_mapper.py ./data/vector/vector${i}.csv > ./data/mapped/mapped${i}.json; done
+```
+
+< 4 min
+
+```
+./scripts/run_mapper.py ./data/vector/vector10_1e6.csv > ./data/mapped/mapped10_1e6.json
+```
+
+
 
 
 ## References
