@@ -10,6 +10,7 @@ __license__ = 'Apache License, Version 2.0'
 import math
 import sys
 import fileinput
+from queue import deque
 
 import argparse
 
@@ -20,7 +21,7 @@ def get_parser():
     parser.add_argument('-n', type=int, required=True,
                         help='number of vertices')
     parser.add_argument(
-        '-t', choices=['num-edges', 'cc', 'conn'], required=True, help='invariant type')
+        '-t', choices=['num-edges', 'cc', 'conn', 'cyclic', 'girth', 'triangle'], required=True, help='invariant type')
     parser.add_argument('path', help='input file path')
     return parser
 
@@ -37,30 +38,51 @@ def num_connected_components(n, edges):
             continue
         ret += 1
         visited[i] = True
-        q = [i]
+        q = deque()
+        q.append(i)
 
         while q:
             p = q.pop()
             for r in edges[p]:
                 if not visited[r]:
                     visited[r] = True
-                    q += [r]
+                    q.append(r)
     return ret
 
+
 def connectedness(n, edges):
-    ret = 0
-    visited = [False for i in range(n)]
+    return 1 if num_connected_components(n, edges) == 1 else 0
 
-    visited[0] = True
-    q = [0]
 
-    while q:
-        p = q.pop()
-        for r in edges[p]:
-            if not visited[r]:
-                visited[r] = True
-                q += [r]
-    return 1 if all(visited) else 0
+def cyclic(n, edges):
+    return 1 if girth(n, edges) == 0 else 0
+
+
+def girth(n, edges):
+    ret = math.inf
+
+    for i in range(n):
+        levels = [math.inf for j in range(n)]
+
+        # DFS (recursion)
+        def rec(v, level, sofar):
+            levels[v] = level
+            for u in edges[v]:
+                if levels[u] == math.inf:
+                    sofar = rec(u, level + 1, sofar)
+                elif levels[u] <= levels[v] - 2:
+                    sofar = min(sofar, levels[v] - levels[u] + 1)
+            return sofar
+
+        ret = rec(i, 0, ret)
+
+    # return nan is the graph is acyclic instead of infinity
+    return math.nan if ret == math.inf else ret
+
+
+def triangle_existence(n, edges):
+    return 1 if girth(n, edges) == 3 else 0
+
 
 def main(args):
     """Entry point of the program. """
@@ -68,6 +90,9 @@ def main(args):
         'num-edges': num_edges,
         'cc': num_connected_components,
         'conn': connectedness,
+        'cyclic': cyclic,
+        'girth': girth,
+        'triangle': triangle_existence,
     }[args.t]
 
     with open(args.path) as f:

@@ -87,34 +87,7 @@ for i in 2 3 4 5 6 7 8; do ./scripts/vectorize.py -n $i ./data/output/graph${i}.
 for i in {2..10}; do ./scripts/vec_to_csv.py ./data/vector/vector${i}.txt > ./data/vector/vector${i}.csv; done
 ```
 
-## Compute Graph Invariants
-
-### (1) Number of Edges
-
-```
-mkdir data/inv
-for i in {2..10}; do ./scripts/invariant.py -n $i -t num-edges ./data/input/graph$i.dat > ./data/inv/graph$i.num-edges.csv; done
-```
-
-< 6 min
-
-### (2) Number of Connected Components
-
-```
-for i in {2..10}; do ./scripts/invariant.py -n $i -t cc ./data/input/graph$i.dat > ./data/inv/graph$i.cc.csv; done
-```
-
-< 7 min
-
-
-### (3) Connectedness (1: connected, 0: disconnected)
-
-```
-for i in {2..10}; do ./scripts/invariant.py -n $i -t conn ./data/input/graph$i.dat > ./data/inv/graph$i.conn.csv; done
-```
-
-
-## For n=10
+## Sampling for n=10
 
 ### (1) Random Sampling
 
@@ -125,27 +98,34 @@ for i in {2..10}; do ./scripts/invariant.py -n $i -t conn ./data/input/graph$i.d
 ### (2) Filter input files
 
 ```
-./scripts/filter_sample.py ./data/vector/vector10.csv ./data/sample_n10_k1e6.txt > ./data/vector/vector10_1e6.csv
-./scripts/filter_sample.py ./data/input/graph10.dat ./data/sample_n10_k1e6.txt > ./data/input/graph10_1e6.dat
+mv ./data/vector/vector10.csv ./data/vector/vector10_all.csv
+./scripts/filter_sample.py ./data/vector/vector10_all.csv ./data/sample_n10_k1e6.txt > ./data/vector/vector10.csv
+mv ./data/input/graph10.dat ./data/input/graph10_all.dat
+./scripts/filter_sample.py ./data/input/graph10_all.dat ./data/sample_n10_k1e6.txt > ./data/input/graph10.dat
 ```
 
 < 2 min
 
-## RunM apper
+
+## Run Mapper
 
 ```
 mkdir data/mapped
-for i in {2..9}; do ./scripts/run_mapper.py ./data/vector/vector${i}.csv > ./data/mapped/mapped${i}.json; done
+for i in {2..10}; do ./scripts/run_mapper.py ./data/vector/vector${i}.csv > ./data/mapped/mapped${i}.json; done
 ```
 
-< 4 min
+< 15 min
+
+## Compute Graph Invariants
 
 ```
-./scripts/run_mapper.py ./data/vector/vector10_1e6.csv > ./data/mapped/mapped10_1e6.json
+mkdir data/inv
+for t in num-edges cc conn cyclic girth; do
+    for i in {2..10}; do ./scripts/invariant.py -n $i -t $t ./data/input/graph$i.dat > ./data/inv/graph$i.$t.csv; done
+done
 ```
 
-
-
+< 15 min
 
 ## References
 
