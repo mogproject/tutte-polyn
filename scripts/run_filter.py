@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Filter a file by the line number s in a given sample definition file.
+Filter a file by the line number s in a given filter definition file.
 """
 
 __author__ = 'Yosuke Mizutani'
@@ -13,10 +13,9 @@ import argparse
 
 def get_parser():
     """Argument parser."""
-    parser = argparse.ArgumentParser(
-        description='Create random samples.')
+    parser = argparse.ArgumentParser(description='Filter a file.')
     parser.add_argument('input_path', help='input file path')
-    parser.add_argument('sample_path', help='sample definition file path')
+    parser.add_argument('sample_path', help='filter definition file path')
     return parser
 
 

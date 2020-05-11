@@ -4,7 +4,7 @@ Computes graph invariants.
 """
 
 __author__ = 'Yosuke Mizutani'
-__version__ = '0.0.1'
+__version__ = '0.0.2'
 __license__ = 'Apache License, Version 2.0'
 
 import math
@@ -23,6 +23,8 @@ def get_parser():
     parser.add_argument(
         '-t', choices=['num-edges', 'cc', 'conn', 'cyclic', 'girth', 'triangle'], required=True, help='invariant type')
     parser.add_argument('path', help='input file path')
+    parser.add_argument('--insert-trivial', type=bool, default=True,
+                        help='process the trivial graph as the first graph input before processing the input file')
     return parser
 
 
@@ -55,7 +57,7 @@ def connectedness(n, edges):
 
 
 def cyclic(n, edges):
-    return 1 if girth(n, edges) == 0 else 0
+    return 0 if girth(n, edges) is math.nan else 1
 
 
 def girth(n, edges):
@@ -94,6 +96,9 @@ def main(args):
         'girth': girth,
         'triangle': triangle_existence,
     }[args.t]
+
+    if args.insert_trivial:
+        print(func(args.n, [[] for i in range(args.n)]))
 
     with open(args.path) as f:
         for line in f:

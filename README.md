@@ -12,6 +12,9 @@ npm install plotlywidget
 pip3 install kmapper
 ```
 
+```
+npm install -g electron@6.1.4 orca
+```
 
 # Data Preparation
 
@@ -27,7 +30,7 @@ mkdir -p data/g6 data/decoded data/input data/output data/vector
 http://users.cecs.anu.edu.au/~bdm/data/graphs.html
 
 - Download the files for "Simple graphs: 2-10 vertices" to `data/g6`
-- Extract `graph10.g6.gz` by `gunzip data/g6/graph.g6.gz`
+- Extract `graph10.g6.gz` by `gunzip data/g6/graph10.g6.gz`
 
 ### (3) Download **showg** program
 
@@ -120,8 +123,9 @@ for i in {2..10}; do ./scripts/run_mapper.py ./data/vector/vector${i}.csv > ./da
 
 ```
 mkdir data/inv
-for t in num-edges cc conn cyclic girth; do
-    for i in {2..10}; do ./scripts/invariant.py -n $i -t $t ./data/input/graph$i.dat > ./data/inv/graph$i.$t.csv; done
+for t in num-edges cc conn cyclic girth triangle; do
+#    for i in {2..10}; do ./scripts/invariant.py -n $i -t $t ./data/input/graph$i.dat > ./data/inv/graph$i.$t.csv; done
+    for i in {2..10}; do ./scripts/invariant.py -n $i -t $t ./data/03_input/graph$i.dat > ./data/06_invariant/graph$i.$t.csv; done
 done
 ```
 
@@ -131,4 +135,61 @@ done
 
 - [Ball mapper: a shape summary for topological data analysis](https://arxiv.org/pdf/1901.07410.pdf)
 
+## Filter connected graphs
+
+```
+for i in {2..9}; do ./scripts/create_filter.py -c conn ./data/06_invariant/graph$i.conn.csv > ./data/07_filter/graph${i}_conn.txt ; done
+```
+
+```
+./scripts/create_filter.py -c conn --sample 1000000 ./data/06_invariant/graph10.conn.csv > ./data/07_filter/graph10_conn_sample.txt
+```
+
+
+
+
+for i in {2..9}; do
+    ./scripts/filter_sample.py ./data/05_vector/vector${i}.csv ./data/07_filter/graph${i}_conn.txt > ./data/08_vector_filtered/vector${i}_conn.csv
+done
+
+for t in cc conn cyclic girth num-edges triangle; do
+    for i in {2..9}; do
+        ./scripts/filter_sample.py ./data/06_invariant/graph${i}.${t}.csv ./data/07_filter/graph${i}_conn.txt > ./data/09_invariant_filtered/graph${i}_conn.${t}.csv
+    done
+done
+
+./scripts/run_filter.py ./data/05_vector/vector10.csv ./data/07_filter/graph10_conn_sample.txt > ./data/08_vector_filtered/vector10_conn_sample.csv
+
+ for t in cc conn cyclic girth num-edges triangle; do
+for% ./scripts/run_filter.py ./data/06_invariant/graph10.${t}.csv ./data/07_filter/graph10_conn_sample.txt > ./data/09_invariant_filtered/graph10_conn_sample.${t}.csv
+for% done
+
+
+
+
+for i in {3..9}
+    do ./scripts/run_mapper.py ./data/08_vector_filtered/vector${i}_conn.csv > ./data/10_mapped/mapped${i}_conn.json
+done
+
+./scripts/run_mapper.py ./data/08_vector_filtered/vector10_conn_sample.csv > ./data/10_mapped/mapped10_conn_sample.json
+
+
+
+
+for t in cc conn cyclic girth num-edges triangle; do
+    for i in {4..9}; do
+        ./scripts/create_visual.py -t "n=${i} connected, color=${t}" \
+        ./data/10_mapped/mapped${i}_conn.json \
+        ./data/09_invariant_filtered/graph${i}_conn.${t}.csv \
+        -o ./data/11_visual/graph${i}_conn.${t}.png
+    done
+done
+
+
+for t in cc conn cyclic girth num-edges triangle; do
+    ./scripts/create_visual.py -t "n=10 connected sampled(1000000), color=${t}" \
+    ./data/10_mapped/mapped10_conn_sample.json \
+    ./data/09_invariant_filtered/graph10_conn_sample.${t}.csv \
+    -o ./data/11_visual/graph10_conn.${t}.png
+done
 
