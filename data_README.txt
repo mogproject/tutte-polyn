@@ -145,3 +145,42 @@ $ head data/07_filter/graph4_conn.txt
 9
 10
 ```
+
+### 8. Filtered vector data
+
+Example:
+
+```
+$ head data/08_vector_filtered/vector4_conn.csv
+0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,1,1,0,1,0,0,0,0,0,0,0,0,0,0
+0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0
+0,1,2,1,1,2,0,0,1,0,0,0,0,0,0,0
+0,2,3,1,2,4,0,0,3,0,0,0,1,0,0,0
+```
+
+### 9. Filtered invariant data
+
+Example: 
+
+```
+$ head data/09_invariant_filtered/graph4_conn.cc.csv
+1
+1
+1
+1
+1
+1
+```
+
+### 10. Mapped graph
+
+Example:
+
+```
+$ head data/10_mapped/mapped4_conn.json
+{"nodes": {"cube0_cluster0": [0, 1], "cube1_cluster0": [0, 1], "cube1_cluster1": [2], "cube2_cluster0": [2], "cube2_cluster1": [3], "cube3_cluster0": [2], "cube3_cluster1": [3]}, "links": {"cube0_cluster0": ["cube1_cluster0"], "cube1_cluster1": ["cube2_cluster0", "cube3_cluster0"], "cube2_cluster0": ["cube3_cluster0"], "cube2_cluster1": ["cube3_cluster1"]}, "simplices": [["cube0_cluster0"], ["cube1_cluster0"], ["cube1_cluster1"], ["cube2_cluster0"], ["cube2_cluster1"], ["cube3_cluster0"], ["cube3_cluster1"], ["cube0_cluster0", "cube1_cluster0"], ["cube1_cluster1", "cube2_cluster0"], ["cube1_cluster1", "cube3_cluster0"], ["cube2_cluster0", "cube3_cluster0"], ["cube2_cluster1", "cube3_cluster1"]], "meta_data": {"projection": "l2norm", "n_cubes": 20, "perc_overlap": 0.7, "clusterer": "KMeans(algorithm='auto', copy_x=True, init='k-means++', max_iter=300,\n       n_clusters=2, n_init=10, n_jobs=None, precompute_distances='auto',\n       random_state=None, tol=0.0001, verbose=0)", "scaler": "MinMaxScaler(copy=True, feature_range=(0, 1))"}, "meta_nodes": {}}
+```
+
+### 11. Visual image

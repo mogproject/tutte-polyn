@@ -4,35 +4,36 @@ Research on the Tutte polynomials.
 # Prerequisite
 
 ```
-pip3 install python-igraph plotly ipywidgets psutil
+pip3 install python-igraph plotly ipywidgets psutil kmapper
+```
+
+```
 npm install plotlywidget
-```
-
-```
-pip3 install kmapper
-```
-
-```
 npm install -g electron@6.1.4 orca
 ```
 
-# Data Preparation
-
-### (1) Create directories
+Directories
 
 ```
-mkdir bin
-mkdir -p data/g6 data/decoded data/input data/output data/vector
+mkdir bin data
+cd data
+mkdir 01_g6 02_decoded 03_input 04_output 05_vector 06_invariant 07_filter 08_vector_filtered 09_invariant_filtered 10_mapped 11_visual
 ```
 
-### (2) Download graph data
+# Workflow
+
+![workflow](flow.png)
+
+## (a) Download graph data
 
 http://users.cecs.anu.edu.au/~bdm/data/graphs.html
 
-- Download the files for "Simple graphs: 2-10 vertices" to `data/g6`
+- Download the files for "Simple graphs: 4-10 vertices" to `data/01_g6`
 - Extract `graph10.g6.gz` by `gunzip data/g6/graph10.g6.gz`
 
-### (3) Download **showg** program
+## (b) Docode g6 format
+
+- Download **showg** program
 
 http://users.cecs.anu.edu.au/~bdm/data/formats.html
 
@@ -40,13 +41,14 @@ http://users.cecs.anu.edu.au/~bdm/data/formats.html
 - Place the file as `bin/showg`
 - Set the execute permission to the file, if needed.
 
-### (4) Decode g6 format
-
 ```
-for i in 2 3 4 5 6 7 8 9 10; do ./bin/showg ./data/g6/graph${i}.g6 ./data/decoded/graph${i}.txt; done
+for i in {4..10}; do ./bin/showg ./data/01_g6/graph${i}.g6 ./data/02_decoded/graph${i}.txt; done
 ```
 
-### (5) Download and build **tuttepoly** program
+### (c) Create input for **tuttepoly** program
+
+
+- Download and build **tuttepoly** program
 
 https://homepages.ecs.vuw.ac.nz/~djp/tutte/#download
 
@@ -62,120 +64,109 @@ make
 
 - Copy program `/tmp/tuttepoly-v*.*.*/tutte/tutte` to `{this directory}/bin/`
 
-### (6) Create input for **tuttepoly** program
-
 ```
-for i in 2 3 4 5 6 7 8 9 10; do ./scripts/conv_data.py ./data/decoded/graph${i}.txt > ./data/input/graph${i}.dat; done
+for i in {4..10}; do ./scripts/conv_data.py ./data/02_decoded/graph${i}.txt > ./data/03_input/graph${i}.dat; done
 ```
 
-### (7) Run **tuttepoly** program
+### (d) Run **tuttepoly** program
+
+Set the cache size 8 GB.
 
 ```
-for i in 2 3 4 5 6 7 8; do ./bin/tutte ./data/input/graph${i}.dat > ./data/output/graph${i}.out; done
-./bin/tutte ./data/input/graph9.dat > ./data/output/graph9.out
-./bin/tutte -c8G ./data/input/graph9.dat > ./data/output/graph9.out
+for i in {4..10}; do ./bin/tutte -c8G ./data/03_input/graph${i}.dat > ./data/04_output/graph${i}.out; done
 ```
 
-### (8) Create vector data
+### (e) Create vector data
 
 ```
-for i in 2 3 4 5 6 7 8; do ./scripts/vectorize.py -n $i ./data/output/graph${i}.out > ./data/vector/vector${i}.txt; done
-./scripts/vectorize.py -n 9 ./data/output/graph9.out > ./data/vector/vector9.txt
-./scripts/vectorize.py -n 10 ./data/output/graph10.out > ./data/vector/vector10.txt
+for i in {4..10}; do ./scripts/vectorize.py -n $i ./data/04_output/graph${i}.out > ./data/05_vector/vector${i}.txt; done
 ```
 
-### (9) Convert vector data into CSV
+- Convert vector data into CSV
 
 ```
-for i in {2..10}; do ./scripts/vec_to_csv.py ./data/vector/vector${i}.txt > ./data/vector/vector${i}.csv; done
+for i in {4..10}; do ./scripts/vec_to_csv.py ./data/05_vector/vector${i}.txt > ./data/05_vector/vector${i}.csv; done
 ```
 
-## Sampling for n=10
-
-### (1) Random Sampling
-
-```
-./scripts/create_sample.py 12005168 1000000 -s 1 > ./data/sample_n10_k1e6.txt
-```
-
-### (2) Filter input files
-
-```
-mv ./data/vector/vector10.csv ./data/vector/vector10_all.csv
-./scripts/filter_sample.py ./data/vector/vector10_all.csv ./data/sample_n10_k1e6.txt > ./data/vector/vector10.csv
-mv ./data/input/graph10.dat ./data/input/graph10_all.dat
-./scripts/filter_sample.py ./data/input/graph10_all.dat ./data/sample_n10_k1e6.txt > ./data/input/graph10.dat
-```
-
-< 2 min
-
-
-## Run Mapper
-
-```
-mkdir data/mapped
-for i in {2..10}; do ./scripts/run_mapper.py ./data/vector/vector${i}.csv > ./data/mapped/mapped${i}.json; done
-```
-
-< 15 min
-
-## Compute Graph Invariants
+### (f) Compute Graph Invariants
 
 ```
 mkdir data/inv
 for t in num-edges cc conn cyclic girth triangle; do
-#    for i in {2..10}; do ./scripts/invariant.py -n $i -t $t ./data/input/graph$i.dat > ./data/inv/graph$i.$t.csv; done
-    for i in {2..10}; do ./scripts/invariant.py -n $i -t $t ./data/03_input/graph$i.dat > ./data/06_invariant/graph$i.$t.csv; done
+    for i in {4..10}; do ./scripts/invariant.py -n $i -t $t ./data/03_input/graph$i.dat > ./data/06_invariant/graph$i.$t.csv; done
 done
 ```
 
-< 15 min
+### (g) [Optional] Create filter definitions
 
-## References
-
-- [Ball mapper: a shape summary for topological data analysis](https://arxiv.org/pdf/1901.07410.pdf)
-
-## Filter connected graphs
+- Example: filter connected graphs
 
 ```
 for i in {2..9}; do ./scripts/create_filter.py -c conn ./data/06_invariant/graph$i.conn.csv > ./data/07_filter/graph${i}_conn.txt ; done
 ```
 
+- Sample 1,000,000 connected graphs with n=10
+
 ```
 ./scripts/create_filter.py -c conn --sample 1000000 ./data/06_invariant/graph10.conn.csv > ./data/07_filter/graph10_conn_sample.txt
 ```
 
+### (h) [Optional] Filter vector data
 
-
-
-for i in {2..9}; do
+```
+for i in {4..9}; do
     ./scripts/filter_sample.py ./data/05_vector/vector${i}.csv ./data/07_filter/graph${i}_conn.txt > ./data/08_vector_filtered/vector${i}_conn.csv
 done
+./scripts/run_filter.py ./data/05_vector/vector10.csv ./data/07_filter/graph10_conn_sample.txt > ./data/08_vector_filtered/vector10_conn_sample.csv
+```
 
+### (i) [Optional] Filter invariant data
+
+```
 for t in cc conn cyclic girth num-edges triangle; do
-    for i in {2..9}; do
+    for i in {4..9}; do
         ./scripts/filter_sample.py ./data/06_invariant/graph${i}.${t}.csv ./data/07_filter/graph${i}_conn.txt > ./data/09_invariant_filtered/graph${i}_conn.${t}.csv
     done
+    ./scripts/run_filter.py ./data/06_invariant/graph10.${t}.csv ./data/07_filter/graph10_conn_sample.txt > ./data/09_invariant_filtered/graph10_conn_sample.${t}.csv
 done
+```
 
-./scripts/run_filter.py ./data/05_vector/vector10.csv ./data/07_filter/graph10_conn_sample.txt > ./data/08_vector_filtered/vector10_conn_sample.csv
+### (j) Run Kepler Mapper
 
- for t in cc conn cyclic girth num-edges triangle; do
-for% ./scripts/run_filter.py ./data/06_invariant/graph10.${t}.csv ./data/07_filter/graph10_conn_sample.txt > ./data/09_invariant_filtered/graph10_conn_sample.${t}.csv
-for% done
+- All instances up to n=9
 
+```
+for i in {4..9}; do ./scripts/run_mapper.py ./data/05_vector/vector${i}.csv > ./data/mapped/mapped${i}.json; done
+```
 
+- Connected graphs only
 
-
-for i in {3..9}
+```
+for i in {4..9}
     do ./scripts/run_mapper.py ./data/08_vector_filtered/vector${i}_conn.csv > ./data/10_mapped/mapped${i}_conn.json
 done
 
 ./scripts/run_mapper.py ./data/08_vector_filtered/vector10_conn_sample.csv > ./data/10_mapped/mapped10_conn_sample.json
+```
 
+### (k) Visualize mapped graph
 
+- All instances up to n=9
 
+```
+for t in cc conn cyclic girth num-edges triangle; do
+    for i in {4..9}; do
+        ./scripts/create_visual.py -t "n=${i} connected, color=${t}" \
+        ./data/10_mapped/mapped${i}.json \
+        ./data/06_invariant/graph${i}.${t}.csv \
+        -o ./data/11_visual/graph${i}.${t}.png
+    done
+done
+```
 
+- Connected graphs only
+
+```
 for t in cc conn cyclic girth num-edges triangle; do
     for i in {4..9}; do
         ./scripts/create_visual.py -t "n=${i} connected, color=${t}" \
@@ -192,4 +183,8 @@ for t in cc conn cyclic girth num-edges triangle; do
     ./data/09_invariant_filtered/graph10_conn_sample.${t}.csv \
     -o ./data/11_visual/graph10_conn.${t}.png
 done
+```
 
+# References
+
+- [Ball mapper: a shape summary for topological data analysis](https://arxiv.org/pdf/1901.07410.pdf)
